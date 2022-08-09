@@ -1,6 +1,6 @@
 'use strict';
 const {
-  Model
+  Model, Op
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Instrument extends Model {
@@ -21,6 +21,36 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Instrument',
+
+    defaultScope: {
+      attributes:{
+        exclude: ['createdAt', 'updatedAt']
+      }
+    },
+
+    scopes: {
+
+      isInstrumentType(type) {
+        return {
+          where:{
+            type: {[Op.like]: `${type}`}
+          }
+        }
+      },
+
+      instrumentByStore(storeId) {
+        const {Store} = require('../models');
+
+        return {
+          include: Store,
+          where: {
+            storeId
+          }
+        }
+      },
+
+    }
+
   });
   return Instrument;
 };
